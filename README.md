@@ -3,6 +3,9 @@
 
 以下のように配置してください
 [Parent directory]
+
 |main.py
+
 |-cogs
+
 | |-cafe.py
