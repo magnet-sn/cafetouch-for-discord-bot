@@ -2,10 +2,8 @@
 ブルーアーカイブのカフェタッチを通知するdiscord bot
 
 以下のように配置してください
-[Parent directory]
-
-|main.py
-
-|-cogs
-
-| |-cafe.py
+[任意のディレクトリ名]/
+ ├─ main.py
+ ├─ .env
+ └─ cogs/
+     └─ cafe.py
