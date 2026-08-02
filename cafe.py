@@ -20,14 +20,14 @@ class CafeControlView(View):
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         allowed_channel = int(os.getenv('CAFE_CHANNEL_ID', 0))
         if interaction.channel_id != allowed_channel:
-            await interaction.response.send_message("このチャンネルでは操作をすることができません。", ephemeral=True)
+            await interaction.response.send_message("❌ このチャンネルでは操作をすることができません。", ephemeral=True)
             return False
 
         user_role_ids = [r.id for r in interaction.user.roles]
         if self.role_id not in user_role_ids:
-            await interaction.response.send_message("権限がありません。", ephemeral=True)
+            await interaction.response.send_message("❌ 権限がありません。", ephemeral=True)
             return False
-            
+
         return True
 
     # --- ボタン1: カフェタッチ完了 (前後に全角スペースを入れて幅を調整しています) ---
@@ -51,7 +51,7 @@ class CafeControlView(View):
             del self.timers[interaction.user.id]
             self.save_timers()
             await interaction.response.edit_message(
-                content="🔕 タイマーを解除しました。",
+                content="🔕 タイマーを解除しました。おやすみなさい。",
                 view=None
             )
         else:
@@ -82,14 +82,14 @@ class CafeLauncherView(View):
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         allowed_channel = int(os.getenv('CAFE_CHANNEL_ID', 0))
         if interaction.channel_id != allowed_channel:
-            await interaction.response.send_message("このチャンネルでは操作をすることができません。", ephemeral=True)
+            await interaction.response.send_message("❌ このチャンネルでは操作をすることができません。", ephemeral=True)
             return False
 
         user_role_ids = [r.id for r in interaction.user.roles]
         if self.role_id not in user_role_ids:
-            await interaction.response.send_message("権限がありません。", ephemeral=True)
+            await interaction.response.send_message("❌ 権限がありません。", ephemeral=True)
             return False
-            
+
         return True
 
     @discord.ui.button(label="コントロールパネルを開く (自分専用)", style=discord.ButtonStyle.secondary, emoji="🎛️", custom_id="cafe_launcher_btn")
@@ -153,13 +153,16 @@ class Cafe(commands.Cog):
                     # 24時から6時までの間は、メンションを抜きにして通知を送信をします
                     if 0 <= now.hour < 6:
                         await channel.send(
-                            f"先生！カフェタッチの時間です！（夜間通知）"
+                            f"先生！カフェタッチの時間です！（夜間通知）",
+                            view=self.launcher_view  # ここにランチャーボタンを追加をします
                         )
                     else:
                         await channel.send(
-                            f"<@{user_id}> 先生！カフェタッチの時間です！"
+                            f"<@{user_id}> 先生！カフェタッチの時間です！",
+                            view=self.launcher_view  # ここにランチャーボタンを追加をします
                         )
 
+                # タイマーを削除するのではなく、現在時刻から1時間後へ更新をします
                 self.cafe_timers[user_id] = now + timedelta(hours=1)
                 self.save_timers()
 
@@ -175,7 +178,7 @@ class Cafe(commands.Cog):
             return
 
         embed = discord.Embed(
-            title="☕ シャーレ カフェタッチタイマー",
+            title="☕ シャーレ カフェ管理システム",
             description="下のボタンを押すと、あなた専用の操作パネルが表示されます。",
             color=0x00B0FF
         )
