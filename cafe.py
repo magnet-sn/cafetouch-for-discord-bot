@@ -20,12 +20,12 @@ class CafeControlView(View):
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         allowed_channel = int(os.getenv('CAFE_CHANNEL_ID', 0))
         if interaction.channel_id != allowed_channel:
-            await interaction.response.send_message("❌ このチャンネルでは操作をすることができません。", ephemeral=True)
+            await interaction.response.send_message("このチャンネルでは操作できません。", ephemeral=True)
             return False
 
         user_role_ids = [r.id for r in interaction.user.roles]
         if self.role_id not in user_role_ids:
-            await interaction.response.send_message("❌ 権限がありません。", ephemeral=True)
+            await interaction.response.send_message("権限がありません。", ephemeral=True)
             return False
 
         return True
@@ -51,7 +51,7 @@ class CafeControlView(View):
             del self.timers[interaction.user.id]
             self.save_timers()
             await interaction.response.edit_message(
-                content="🔕 タイマーを解除しました。おやすみなさい。",
+                content="🔕 タイマーを解除しました。",
                 view=None
             )
         else:
@@ -92,7 +92,7 @@ class CafeLauncherView(View):
 
         return True
 
-    @discord.ui.button(label="コントロールパネルを開く (自分専用)", style=discord.ButtonStyle.secondary, emoji="🎛️", custom_id="cafe_launcher_btn")
+    @discord.ui.button(label="コントロールパネルを開く", style=discord.ButtonStyle.secondary, emoji="🎛️", custom_id="cafe_launcher_btn")
     async def launch_panel(self, interaction: discord.Interaction, button: Button):
         # ★ここで「自分にだけ見える (ephemeral=True)」パネルを送信します
         # 新しく生成をせずに、受け取った self.control_view を使い回します
@@ -179,7 +179,7 @@ class Cafe(commands.Cog):
 
         embed = discord.Embed(
             title="☕ シャーレ カフェ管理システム",
-            description="下のボタンを押すと、あなた専用の操作パネルが表示されます。",
+            description="下のボタンを押すと、操作パネルが表示されます。",
             color=0x00B0FF
         )
 
